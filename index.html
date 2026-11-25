@@ -35,7 +35,7 @@ const ST={g:k=>{try{return localStorage.getItem(k)}catch(e){}},s:(k,v)=>{try{v==
 const SM={s_hadir:['🎒','Hadir Siswa'],s_pulang:['🏠','Pulang Siswa'],a_hadir:['🎉','Hadir Acara'],a_pulang:['🚪','Pulang Acara'],k_mulai:['▶️','Mulai Kelas'],k_selesai:['⏹️','Selesai Kelas']};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let T=ST.g('t'),U=null,cam=null;
-const api=(fn,a=[])=>fetch(API,{method:'POST',body:JSON.stringify({fn,t:T,a})}).then(r=>r.json()).then(j=>{if(j.err){if(/SESSION/.test(j.err))out();throw new Error(j.err)}return j.r});
+const api=(fn,a=[])=>fetch(API,{method:'POST',body:JSON.stringify({fn,t:T,a})}).then(r=>r.json(),()=>{throw new Error(/\/exec$/.test(API)?'Gagal terhubung ke server. Pastikan deployment Web App: Access = Anyone, dan sudah New version.':'URL API belum benar. Isi const API dengan URL Web App yang berakhiran /exec')}).catch(e=>{throw e instanceof SyntaxError?new Error('Server membalas halaman HTML, bukan data. Deploy Code.gs terbaru sebagai New version.'):e}).then(j=>{if(j.err){if(/SESSION/.test(j.err))out();throw new Error(j.err)}return j.r});
 const LOGO='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="%23fff"/><path d="M8 8h10v10H8zM22 8h10v10H22zM8 22h10v10H8zM24 24h6v6h-6z" fill="%236d28d9"/></svg>';
 function apply(S){document.documentElement.style.setProperty('--pc',S.color||'#6d28d9');document.title=S.appName||'QRSCAN';
  document.querySelectorAll('.lo').forEach(i=>i.src=S.logo||LOGO);document.querySelectorAll('.an').forEach(e=>e.textContent=S.appName||'QRSCAN');document.querySelectorAll('.co').forEach(e=>e.textContent=S.company||'')}
