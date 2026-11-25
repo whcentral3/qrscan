@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QRSCAN</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{--pc:#6d28d9;--bg:#0f1115;--cd:#1a1d24;--tx:#f1f5f9;--mu:#94a3b8;--bd:#2a2f3a}
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh}
+[hidden]{display:none!important}
+.w{max-width:520px;margin:auto;padding:14px}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px}
+h2{font-size:15px;margin:0}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:#0f1115;color:var(--tx);font-size:14px}
+.btn{background:var(--pc);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.hd{display:flex;align-items:center;gap:10px}.hd img{width:36px;height:36px;border-radius:50%;background:#fff;object-fit:cover}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.m{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer;font-weight:700}
+.m:hover{border-color:var(--pc)}.m i{display:block;font-style:normal;font-size:26px;margin-bottom:6px}
+#rd{width:100%;border-radius:12px;overflow:hidden;background:#000;min-height:260px}
+#rs{margin:10px 0;padding:12px;border-radius:10px;font-weight:700;background:#222;text-align:center}
+#rs.ok{background:#14532d}#rs.no{background:#7f1d1d}
+#ls div{padding:5px 0;border-top:1px solid var(--bd);color:var(--mu)}
+</style></head><body><div class="w">
+<div id="lg" class="card" style="margin-top:12vh;text-align:center"><img class="lo" width="56" height="56" style="border-radius:50%;background:#fff"><h2 class="an" style="margin:8px 0 2px">QRSCAN</h2><small class="co" style="color:var(--mu)"></small>
+<div style="display:grid;gap:8px;margin-top:14px"><input id="lu" placeholder="Username" autocapitalize="off"><div style="display:flex;gap:6px"><input id="lp" type="password" placeholder="Password"><button class="btn" id="eye" type="button">👁</button></div><button class="btn" id="lb">Masuk</button></div></div>
+
+<div id="home" hidden><div class="bar"><div class="hd"><img class="lo"><div><b class="an"></b><br><small id="un" style="color:var(--mu)"></small></div></div><button class="btn" id="out" style="background:#374151">Keluar</button></div><div class="g" id="mg"></div></div>
+
+<div id="sc" hidden><div class="bar"><button class="btn" id="bk" style="background:#374151">← Kembali</button><h2 id="st"></h2></div><div class="card">
+<select id="ac" hidden style="margin-bottom:8px"></select><p id="gu" hidden style="color:var(--mu);margin:0 0 8px"></p><div id="rd"></div><div id="rs">Arahkan kamera ke QR…</div><div id="ls"></div></div></div>
+</div>
+<script>
+const API='https://script.google.com/macros/s/AKfycbxztwZmbSgnrVWWf8Btuy_k0KLaTMwA9Ram7SfdrsjgrG3YOTdfu6C_wXaPr92NEO9y/exec';
+const $=s=>document.querySelector(s);
+const ST={g:k=>{try{return localStorage.getItem(k)}catch(e){}},s:(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
+const SM={s_hadir:['🎒','Hadir Siswa'],s_pulang:['🏠','Pulang Siswa'],a_hadir:['🎉','Hadir Acara'],a_pulang:['🚪','Pulang Acara'],k_mulai:['▶️','Mulai Kelas'],k_selesai:['⏹️','Selesai Kelas']};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let T=ST.g('t'),U=null,cam=null;
+const api=(fn,a=[])=>fetch(API,{method:'POST',body:JSON.stringify({fn,t:T,a})}).then(r=>r.json()).then(j=>{if(j.err){if(/SESSION/.test(j.err))out();throw new Error(j.err)}return j.r});
+const LOGO='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="%23fff"/><path d="M8 8h10v10H8zM22 8h10v10H22zM8 22h10v10H8zM24 24h6v6h-6z" fill="%236d28d9"/></svg>';
+function apply(S){document.documentElement.style.setProperty('--pc',S.color||'#6d28d9');document.title=S.appName||'QRSCAN';
+ document.querySelectorAll('.lo').forEach(i=>i.src=S.logo||LOGO);document.querySelectorAll('.an').forEach(e=>e.textContent=S.appName||'QRSCAN');document.querySelectorAll('.co').forEach(e=>e.textContent=S.company||'')}
+function beep(ok){try{navigator.vibrate&&navigator.vibrate(ok?60:[80,60,80]);const c=new(window.AudioContext||webkitAudioContext)(),o=c.createOscillator();o.frequency.value=ok?880:300;o.connect(c.destination);o.start();setTimeout(()=>{o.stop();c.close()},130)}catch(e){}}
+function stopCam(){try{if(cam){cam.stop().catch(()=>{});cam=null}}catch(e){}}
+function out(){T=null;ST.s('t',null);stopCam();$('#home').hidden=$('#sc').hidden=true;$('#lg').hidden=false}
+function home(){stopCam();$('#sc').hidden=true;$('#home').hidden=false}
+function start(){$('#lg').hidden=true;$('#un').textContent=U.nama+' ('+U.role+')';
+ $('#mg').innerHTML=U.role=='owner'?'<div class="card" style="grid-column:1/3">Role owner hanya dapat melihat data.</div>':Object.keys(SM).map(k=>`<div class="m" data-m="${k}"><i>${SM[k][0]}</i>${SM[k][1]}</div>`).join('');home()}
+$('#mg').onclick=e=>{const m=e.target.closest('[data-m]');if(m)scanP(m.dataset.m)};
+$('#bk').onclick=home;$('#out').onclick=out;
+$('#eye').onclick=()=>{const i=$('#lp');i.type=i.type=='password'?'text':'password'};
+$('#lp').onkeydown=e=>{if(e.key=='Enter')$('#lb').click()};
+$('#lb').onclick=async()=>{$('#lb').disabled=true;try{T=null;const r=await api('login',[$('#lu').value.trim(),$('#lp').value]);if(!r)alert('Username / password salah');else{T=r.t;ST.s('t',T);U=r.u;start()}}catch(e){alert(e.message)}$('#lb').disabled=false};
+
+async function scanP(m){const ac=m[0]=='a',kl=m[0]=='k',hint='Langkah 1: scan QR-Guru, lalu QR-Kelas';let G='',last='',lt=0;
+ $('#home').hidden=true;$('#sc').hidden=false;$('#st').textContent=SM[m][1];$('#rs').className='';$('#rs').textContent='Menyiapkan kamera…';$('#ls').innerHTML='';
+ $('#ac').hidden=!ac;$('#gu').hidden=!kl;$('#gu').textContent=hint;
+ if(ac){try{const A=(await api('list',['Acara'])).sort((a,b)=>a.tanggal<b.tanggal?1:-1);$('#ac').innerHTML=A.map(a=>`<option>${esc(a.nama)}</option>`).join('')}catch(e){alert(e.message)}}
+ const onScan=tx=>{const n=Date.now();if(tx==last&&n-lt<3000)return;last=tx;lt=n;
+  api('scan',[{mode:m,text:tx,acara:ac?$('#ac').value:'',guru:G}]).then(r=>{const e=$('#rs');e.className=r.ok?'ok':'no';e.textContent=(r.ok?'✔ ':'✖ ')+r.msg;beep(r.ok);
+   if(r.step=='guru'){G=r.nama;$('#gu').textContent='Guru: '+G+' → scan QR-Kelas'}
+   else if(r.ok){if(kl){G='';$('#gu').textContent=hint}$('#ls').insertAdjacentHTML('afterbegin',`<div>${new Date().toLocaleTimeString()} — ${esc(r.nama)}</div>`)}}).catch(e=>{$('#rs').className='no';$('#rs').textContent='✖ '+e.message})};
+ cam=new Html5Qrcode('rd');
+ cam.start({facingMode:'environment'},{fps:12,qrbox:{width:240,height:240}},onScan,()=>{}).then(()=>{$('#rs').textContent='Arahkan kamera ke QR…'}).catch(er=>{$('#rs').className='no';$('#rs').textContent='Kamera gagal: '+((er&&er.name)||er)+'. Izinkan kamera di pengaturan browser.'})}
+
+fetch(API,{method:'POST',body:JSON.stringify({fn:'pub',a:[]})}).then(r=>r.json()).then(j=>apply(j.r||{})).catch(()=>apply({}));
+if(T)api('me').then(u=>{U=u;start()}).catch(()=>{});
+</script></body></html>
