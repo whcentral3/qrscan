@@ -46,7 +46,7 @@ function home(){stopCam();$('#sc').hidden=true;$('#home').hidden=false}
 function start(){$('#lg').hidden=true;$('#un').textContent=U.nama+' ('+U.role+')';
  $('#mg').innerHTML=U.role=='owner'?'<div class="card" style="grid-column:1/3">Role owner hanya dapat melihat data.</div>':Object.keys(SM).map(k=>`<div class="m" data-m="${k}"><i>${SM[k][0]}</i>${SM[k][1]}</div>`).join('');home()}
 $('#mg').onclick=e=>{const m=e.target.closest('[data-m]');if(m)scanP(m.dataset.m)};
-$('#bk').onclick=home;$('#out').onclick=out;$('#mm').onclick=$('#mm2').onclick=()=>{location.href=API};
+$('#bk').onclick=home;$('#out').onclick=out;$('#mm').onclick=$('#mm2').onclick=()=>{location.href='https://whcentral3.github.io/scanapp/'};
 $('#eye').onclick=()=>{const i=$('#lp');i.type=i.type=='password'?'text':'password'};
 $('#lp').onkeydown=e=>{if(e.key=='Enter')$('#lb').click()};
 $('#lb').onclick=async()=>{$('#lb').disabled=true;try{T=null;const r=await api('login',[$('#lu').value.trim(),$('#lp').value]);if(!r)alert('Username / password salah');else{T=r.t;ST.s('t',T);U=r.u;start()}}catch(e){alert(e.message)}$('#lb').disabled=false};
