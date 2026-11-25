@@ -32,7 +32,7 @@ input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--b
 const API='https://script.google.com/macros/s/AKfycbxztwZmbSgnrVWWf8Btuy_k0KLaTMwA9Ram7SfdrsjgrG3YOTdfu6C_wXaPr92NEO9y/exec';
 const $=s=>document.querySelector(s);
 const ST={g:k=>{try{return localStorage.getItem(k)}catch(e){}},s:(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
-const SM={s_hadir:['🎒','Hadir Siswa'],s_pulang:['🏠','Pulang Siswa'],a_hadir:['🎉','Hadir Acara'],a_pulang:['🚪','Pulang Acara'],k_mulai:['▶️','Mulai Kelas'],k_selesai:['⏹️','Selesai Kelas']};
+const SM={s_hadir:['🎒','Hadir Siswa'],s_pulang:['🏠','Pulang Siswa'],a_hadir:['🎉','Hadir Guru/Pegawai'],a_pulang:['🚪','Pulang Guru/Pegawai'],k_mulai:['▶️','Mulai Kelas'],k_selesai:['⏹️','Selesai Kelas']};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let T=ST.g('t'),U=null,cam=null;
 const api=(fn,a=[])=>fetch(API,{method:'POST',body:JSON.stringify({fn,t:T,a})}).then(r=>r.json(),()=>{throw new Error(/\/exec$/.test(API)?'Gagal terhubung ke server. Pastikan deployment Web App: Access = Anyone, dan sudah New version.':'URL API belum benar. Isi const API dengan URL Web App yang berakhiran /exec')}).catch(e=>{throw e instanceof SyntaxError?new Error('Server membalas halaman HTML, bukan data. Deploy Code.gs terbaru sebagai New version.'):e}).then(j=>{if(j.err){if(/SESSION/.test(j.err))out();throw new Error(j.err)}return j.r});
@@ -51,10 +51,10 @@ $('#eye').onclick=()=>{const i=$('#lp');i.type=i.type=='password'?'text':'passwo
 $('#lp').onkeydown=e=>{if(e.key=='Enter')$('#lb').click()};
 $('#lb').onclick=async()=>{$('#lb').disabled=true;try{T=null;const r=await api('login',[$('#lu').value.trim(),$('#lp').value]);if(!r)alert('Username / password salah');else{T=r.t;ST.s('t',T);U=r.u;start()}}catch(e){alert(e.message)}$('#lb').disabled=false};
 
-async function scanP(m){const ac=m[0]=='a',kl=m[0]=='k',hint='Langkah 1: scan QR-Guru, lalu QR-Kelas';let G='',last='',lt=0;
+async function scanP(m){const ac=m[0]!='k',kl=m[0]=='k',hint='Langkah 1: scan QR-Guru, lalu QR-Kelas';let G='',last='',lt=0;
  $('#home').hidden=true;$('#sc').hidden=false;$('#st').textContent=SM[m][1];$('#rs').className='';$('#rs').textContent='Menyiapkan kamera…';$('#ls').innerHTML='';
  $('#ac').hidden=!ac;$('#gu').hidden=!kl;$('#gu').textContent=hint;
- if(ac){try{const A=(await api('list',['Acara'])).sort((a,b)=>a.tanggal<b.tanggal?1:-1);$('#ac').innerHTML=A.map(a=>`<option>${esc(a.nama)}</option>`).join('')}catch(e){alert(e.message)}}
+ if(ac){try{const A=(await api('list',['Acara'])).filter(a=>(a.target||'Siswa')==(m[0]=='s'?'Siswa':'Staf')).sort((a,b)=>a.tanggal<b.tanggal?1:-1);$('#ac').innerHTML=A.length?A.map(a=>`<option value="${a.id}">${esc(a.tanggal+' — '+a.nama)}</option>`).join(''):'<option value="">Belum ada acara (buat di aplikasi utama)</option>'}catch(e){alert(e.message)}}
  const onScan=tx=>{const n=Date.now();if(tx==last&&n-lt<3000)return;last=tx;lt=n;
   api('scan',[{mode:m,text:tx,acara:ac?$('#ac').value:'',guru:G}]).then(r=>{const e=$('#rs');e.className=r.ok?'ok':'no';e.textContent=(r.ok?'✔ ':'✖ ')+r.msg;beep(r.ok);
    if(r.step=='guru'){G=r.nama;$('#gu').textContent='Guru: '+G+' → scan QR-Kelas'}
