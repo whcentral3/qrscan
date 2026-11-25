@@ -23,9 +23,9 @@ input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--b
 <div id="lg" class="card" style="margin-top:12vh;text-align:center"><img class="lo" width="56" height="56" style="border-radius:50%;background:#fff"><h2 class="an" style="margin:8px 0 2px">QRSCAN</h2><small class="co" style="color:var(--mu)"></small>
 <div style="display:grid;gap:8px;margin-top:14px"><input id="lu" placeholder="Username" autocapitalize="off"><div style="display:flex;gap:6px"><input id="lp" type="password" placeholder="Password"><button class="btn" id="eye" type="button">👁</button></div><button class="btn" id="lb">Masuk</button></div></div>
 
-<div id="home" hidden><div class="bar"><div class="hd"><img class="lo"><div><b class="an"></b><br><small id="un" style="color:var(--mu)"></small></div></div><button class="btn" id="out" style="background:#374151">Keluar</button></div><div class="g" id="mg"></div></div>
+<div id="home" hidden><div class="bar"><div class="hd"><img class="lo"><div><b class="an"></b><br><small id="un" style="color:var(--mu)"></small></div></div><div style="display:flex;gap:6px"><button class="btn" id="mm">🏠 Menu Utama</button><button class="btn" id="out" style="background:#374151">Keluar</button></div></div><div class="g" id="mg"></div></div>
 
-<div id="sc" hidden><div class="bar"><button class="btn" id="bk" style="background:#374151">← Kembali</button><h2 id="st"></h2></div><div class="card">
+<div id="sc" hidden><div class="bar"><button class="btn" id="bk" style="background:#374151">← Kembali</button><h2 id="st"></h2><button class="btn" id="mm2" style="background:#374151">🏠</button></div><div class="card">
 <select id="ac" hidden style="margin-bottom:8px"></select><p id="gu" hidden style="color:var(--mu);margin:0 0 8px"></p><div id="rd"></div><div id="rs">Arahkan kamera ke QR…</div><div id="ls"></div></div></div>
 </div>
 <script>
@@ -46,7 +46,7 @@ function home(){stopCam();$('#sc').hidden=true;$('#home').hidden=false}
 function start(){$('#lg').hidden=true;$('#un').textContent=U.nama+' ('+U.role+')';
  $('#mg').innerHTML=U.role=='owner'?'<div class="card" style="grid-column:1/3">Role owner hanya dapat melihat data.</div>':Object.keys(SM).map(k=>`<div class="m" data-m="${k}"><i>${SM[k][0]}</i>${SM[k][1]}</div>`).join('');home()}
 $('#mg').onclick=e=>{const m=e.target.closest('[data-m]');if(m)scanP(m.dataset.m)};
-$('#bk').onclick=home;$('#out').onclick=out;
+$('#bk').onclick=home;$('#out').onclick=out;$('#mm').onclick=$('#mm2').onclick=()=>{location.href=API};
 $('#eye').onclick=()=>{const i=$('#lp');i.type=i.type=='password'?'text':'password'};
 $('#lp').onkeydown=e=>{if(e.key=='Enter')$('#lb').click()};
 $('#lb').onclick=async()=>{$('#lb').disabled=true;try{T=null;const r=await api('login',[$('#lu').value.trim(),$('#lp').value]);if(!r)alert('Username / password salah');else{T=r.t;ST.s('t',T);U=r.u;start()}}catch(e){alert(e.message)}$('#lb').disabled=false};
