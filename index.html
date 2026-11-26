@@ -12,9 +12,10 @@ input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--b
 .btn{background:var(--pc);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
 .hd{display:flex;align-items:center;gap:10px}.hd img{width:36px;height:36px;border-radius:50%;background:#fff;object-fit:cover}
-.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.m{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer;font-weight:700}
-.m:hover{border-color:var(--pc)}.m i{display:block;font-style:normal;font-size:26px;margin-bottom:6px}
+.g{display:grid;gap:10px}
+.m{display:block;text-decoration:none;color:var(--tx);background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:16px;font-weight:700}
+.m:hover{border-color:var(--pc)}.m i{font-style:normal;font-size:24px;margin-right:10px}.m small{display:block;color:var(--mu);font-weight:400;margin-top:4px}
+#tg{display:flex;gap:8px;margin-bottom:10px}#tg .btn{flex:1;padding:14px;font-size:15px;background:#374151}#tg .btn.on{background:var(--pc)}
 #rd{width:100%;border-radius:12px;overflow:hidden;background:#000;min-height:260px}
 #rs{margin:10px 0;padding:12px;border-radius:10px;font-weight:700;background:#222;text-align:center}
 #rs.ok{background:#14532d}#rs.no{background:#7f1d1d}
@@ -23,44 +24,59 @@ input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--b
 <div id="lg" class="card" style="margin-top:12vh;text-align:center"><img class="lo" width="56" height="56" style="border-radius:50%;background:#fff"><h2 class="an" style="margin:8px 0 2px">QRSCAN</h2><small class="co" style="color:var(--mu)"></small>
 <div style="display:grid;gap:8px;margin-top:14px"><input id="lu" placeholder="Username" autocapitalize="off"><div style="display:flex;gap:6px"><input id="lp" type="password" placeholder="Password"><button class="btn" id="eye" type="button">👁</button></div><button class="btn" id="lb">Masuk</button></div></div>
 
-<div id="home" hidden><div class="bar"><div class="hd"><img class="lo"><div><b class="an"></b><br><small id="un" style="color:var(--mu)"></small></div></div><div style="display:flex;gap:6px"><button class="btn" id="mm">🏠 Menu Utama</button><button class="btn" id="out" style="background:#374151">Keluar</button></div></div><div class="g" id="mg"></div></div>
+<div id="home" hidden><div class="bar"><div class="hd"><img class="lo"><div><b class="an"></b><br><small id="un" style="color:var(--mu)"></small></div></div><div style="display:flex;gap:6px"><button class="btn" id="mm">🏠 Menu Utama</button><button class="btn" id="out" style="background:#374151">Keluar</button></div></div>
+<div class="g"><a class="m" href="#absensi"><i>🚪</i>Scan Absensi<small>Gerbang sekolah: QR siswa &amp; staf, masuk dan pulang</small></a><a class="m" href="#acara"><i>🎉</i>Scan Acara<small>Pilih acara yang sudah dibuat, lalu scan hadir / pulang</small></a><a class="m" href="#pembelajaran"><i>📚</i>Scan Pembelajaran<small>Guru scan QR-Guru, lalu QR-Kelas saat mulai / selesai</small></a></div></div>
 
-<div id="sc" hidden><div class="bar"><button class="btn" id="bk" style="background:#374151">← Kembali</button><h2 id="st"></h2><button class="btn" id="mm2" style="background:#374151">🏠</button></div><div class="card">
-<select id="ac" hidden style="margin-bottom:8px"></select><p id="gu" hidden style="color:var(--mu);margin:0 0 8px"></p><div id="rd"></div><div id="rs">Arahkan kamera ke QR…</div><div id="ls"></div></div></div>
+<div id="sc" hidden><div class="bar"><button class="btn" id="bk" style="background:#374151">← Menu Scan</button><h2 id="st"></h2><button class="btn" id="mm2" style="background:#374151">🏠</button></div><div class="card">
+<div id="tg"></div><select id="ac" hidden style="margin-bottom:8px"></select><p id="gu" hidden style="color:var(--mu);margin:0 0 8px"></p><div id="rd"></div><div id="rs">Arahkan kamera ke QR…</div><div id="ls"></div></div></div>
 </div>
 <script>
-const API='https://script.google.com/macros/s/AKfycbxztwZmbSgnrVWWf8Btuy_k0KLaTMwA9Ram7SfdrsjgrG3YOTdfu6C_wXaPr92NEO9y/exec';
+const API='https://script.google.com/macros/s/AKfycbxztwZmbSgnrVWWf8Btuy_k0KLaTMwA9Ram7SfdrsjgrG3YOTdfu6C_wXaPr92NEO9y/exec',MAIN='https://whcentral3.github.io/scanapp/';
 const $=s=>document.querySelector(s);
 const ST={g:k=>{try{return localStorage.getItem(k)}catch(e){}},s:(k,v)=>{try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
-const SM={s_hadir:['🎒','Hadir Siswa'],s_pulang:['🏠','Pulang Siswa'],a_hadir:['🎉','Hadir Guru/Pegawai'],a_pulang:['🚪','Pulang Guru/Pegawai'],k_mulai:['▶️','Mulai Kelas'],k_selesai:['⏹️','Selesai Kelas']};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let T=ST.g('t'),U=null,cam=null;
-const api=(fn,a=[])=>fetch(API,{method:'POST',body:JSON.stringify({fn,t:T,a})}).then(r=>r.json(),()=>{throw new Error(/\/exec$/.test(API)?'Gagal terhubung ke server. Pastikan deployment Web App: Access = Anyone, dan sudah New version.':'URL API belum benar. Isi const API dengan URL Web App yang berakhiran /exec')}).catch(e=>{throw e instanceof SyntaxError?new Error('Server membalas halaman HTML, bukan data. Deploy Code.gs terbaru sebagai New version.'):e}).then(j=>{if(j.err){if(/SESSION/.test(j.err))out();throw new Error(j.err)}return j.r});
+const fd=s=>/^\d{4}-\d\d-\d\d/.test(s)?s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4):s;
+const HINT='Langkah 1: guru scan QR-Guru, lalu QR-Kelas';
+const PG={absensi:{t:'Scan Absensi',a:['hadir','Masuk (Hadir)'],b:['pulang','Pulang']},acara:{t:'Scan Acara',a:['hadir','Hadir'],b:['pulang','Pulang']},pembelajaran:{t:'Scan Pembelajaran',a:['mulai','Mulai Kelas'],b:['selesai','Selesai Kelas']}};
+let T=ST.g('t'),U=null,cam=null,mode='',G='',pg='',last='',lt=0;
+const api=(fn,a=[])=>fetch(API,{method:'POST',body:JSON.stringify({fn,t:T,a})}).then(r=>r.json(),()=>{throw new Error('Gagal terhubung ke server. Cek internet / deployment.')}).catch(e=>{throw e instanceof SyntaxError?new Error('Server membalas halaman HTML. Deploy Code.gs terbaru (New version).'):e}).then(j=>{if(j.err){if(/SESSION/.test(j.err))out();throw new Error(j.err)}return j.r});
 const LOGO='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="%23fff"/><path d="M8 8h10v10H8zM22 8h10v10H22zM8 22h10v10H8zM24 24h6v6h-6z" fill="%236d28d9"/></svg>';
 function apply(S){document.documentElement.style.setProperty('--pc',S.color||'#6d28d9');document.title=S.appName||'QRSCAN';
  document.querySelectorAll('.lo').forEach(i=>i.src=S.logo||LOGO);document.querySelectorAll('.an').forEach(e=>e.textContent=S.appName||'QRSCAN');document.querySelectorAll('.co').forEach(e=>e.textContent=S.company||'')}
 function beep(ok){try{navigator.vibrate&&navigator.vibrate(ok?60:[80,60,80]);const c=new(window.AudioContext||webkitAudioContext)(),o=c.createOscillator();o.frequency.value=ok?880:300;o.connect(c.destination);o.start();setTimeout(()=>{o.stop();c.close()},130)}catch(e){}}
 function stopCam(){try{if(cam){cam.stop().catch(()=>{});cam=null}}catch(e){}}
-function out(){T=null;ST.s('t',null);stopCam();$('#home').hidden=$('#sc').hidden=true;$('#lg').hidden=false}
-function home(){stopCam();$('#sc').hidden=true;$('#home').hidden=false}
+async function lock(){try{await navigator.wakeLock.request('screen')}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pg&&!$('#sc').hidden)lock()});
+const setRS=(c,t)=>{$('#rs').className=c;$('#rs').textContent=t};
+const setTog=()=>document.querySelectorAll('#tg .btn').forEach(b=>b.classList.toggle('on',b.dataset.m==mode));
+
+function out(){T=null;ST.s('t',null);stopCam();pg='';$('#home').hidden=$('#sc').hidden=true;$('#lg').hidden=false}
+function home(){stopCam();pg='';$('#sc').hidden=true;$('#home').hidden=false}
+function route(){if(!T||!U)return;const p=location.hash.slice(1);if(PG[p])openP(p);else home()}
 function start(){$('#lg').hidden=true;$('#un').textContent=U.nama+' ('+U.role+')';
- $('#mg').innerHTML=U.role=='owner'?'<div class="card" style="grid-column:1/3">Role owner hanya dapat melihat data.</div>':Object.keys(SM).map(k=>`<div class="m" data-m="${k}"><i>${SM[k][0]}</i>${SM[k][1]}</div>`).join('');home()}
-$('#mg').onclick=e=>{const m=e.target.closest('[data-m]');if(m)scanP(m.dataset.m)};
-$('#bk').onclick=home;$('#out').onclick=out;$('#mm').onclick=$('#mm2').onclick=()=>{location.href='https://whcentral3.github.io/scanapp/'};
+ if(U.role=='owner'){$('#home').hidden=false;document.querySelector('#home .g').innerHTML='<div class="card">Role owner hanya dapat melihat data.</div>';return}route()}
+window.onhashchange=route;
+$('#tg').onclick=e=>{const b=e.target.closest('[data-m]');if(b){mode=b.dataset.m;setTog()}};
+$('#bk').onclick=()=>{location.hash='';home()};
+$('#out').onclick=out;$('#mm').onclick=$('#mm2').onclick=()=>{location.href=MAIN};
 $('#eye').onclick=()=>{const i=$('#lp');i.type=i.type=='password'?'text':'password'};
 $('#lp').onkeydown=e=>{if(e.key=='Enter')$('#lb').click()};
 $('#lb').onclick=async()=>{$('#lb').disabled=true;try{T=null;const r=await api('login',[$('#lu').value.trim(),$('#lp').value]);if(!r)alert('Username / password salah');else{T=r.t;ST.s('t',T);U=r.u;start()}}catch(e){alert(e.message)}$('#lb').disabled=false};
 
-async function scanP(m){const ac=m[0]!='k',kl=m[0]=='k',hint='Langkah 1: scan QR-Guru, lalu QR-Kelas';let G='',last='',lt=0;
- $('#home').hidden=true;$('#sc').hidden=false;$('#st').textContent=SM[m][1];$('#rs').className='';$('#rs').textContent='Menyiapkan kamera…';$('#ls').innerHTML='';
- $('#ac').hidden=!ac;$('#gu').hidden=!kl;$('#gu').textContent=hint;
- if(ac){try{const A=(await api('list',['Acara'])).filter(a=>(a.target||'Siswa')==(m[0]=='s'?'Siswa':'Staf')).sort((a,b)=>a.tanggal<b.tanggal?1:-1);$('#ac').innerHTML=A.length?A.map(a=>`<option value="${a.id}">${esc(a.tanggal+' — '+a.nama)}</option>`).join(''):'<option value="">Belum ada acara (buat di aplikasi utama)</option>'}catch(e){alert(e.message)}}
- const onScan=tx=>{const n=Date.now();if(tx==last&&n-lt<3000)return;last=tx;lt=n;
-  api('scan',[{mode:m,text:tx,acara:ac?$('#ac').value:'',guru:G}]).then(r=>{const e=$('#rs');e.className=r.ok?'ok':'no';e.textContent=(r.ok?'✔ ':'✖ ')+r.msg;beep(r.ok);
-   if(r.step=='guru'){G=r.nama;$('#gu').textContent='Guru: '+G+' → scan QR-Kelas'}
-   else if(r.ok){if(kl){G='';$('#gu').textContent=hint}$('#ls').insertAdjacentHTML('afterbegin',`<div>${new Date().toLocaleTimeString()} — ${esc(r.nama)}</div>`)}}).catch(e=>{$('#rs').className='no';$('#rs').textContent='✖ '+e.message})};
+async function openP(p){stopCam();pg=p;G='';last='';const c=PG[p];mode=c.a[0];
+ $('#home').hidden=true;$('#sc').hidden=false;$('#st').textContent=c.t;
+ $('#tg').innerHTML=[c.a,c.b].map(x=>`<button class="btn" data-m="${x[0]}">${x[1]}</button>`).join('');setTog();
+ $('#ac').hidden=p!='acara';$('#gu').hidden=p!='pembelajaran';$('#gu').textContent=HINT;$('#ls').innerHTML='';setRS('','Menyiapkan kamera…');
+ if(p=='acara'){try{const A=(await api('list',['Acara'])).sort((a,b)=>a.tanggal<b.tanggal?1:-1);
+  $('#ac').innerHTML=A.length?A.map(a=>`<option value="${a.id}">${esc(a.nama)} — ${fd(a.tanggal)} (${esc(a.target||'Siswa')})</option>`).join(''):'<option value="">Belum ada acara (buat di menu Data > Acara)</option>'}catch(e){alert(e.message)}}
  cam=new Html5Qrcode('rd');
- cam.start({facingMode:'environment'},{fps:12,qrbox:{width:240,height:240}},onScan,()=>{}).then(()=>{$('#rs').textContent='Arahkan kamera ke QR…'}).catch(er=>{$('#rs').className='no';$('#rs').textContent='Kamera gagal: '+((er&&er.name)||er)+'. Izinkan kamera di pengaturan browser.'})}
+ cam.start({facingMode:'environment'},{fps:12,qrbox:{width:240,height:240}},onScan,()=>{}).then(()=>setRS('','Arahkan kamera ke QR…')).catch(er=>setRS('no','Kamera gagal: '+((er&&er.name)||er)+'. Izinkan kamera di pengaturan browser.'));
+ lock()}
+function onScan(tx){const n=Date.now();if(tx==last&&n-lt<2500)return;last=tx;lt=n;
+ const q={absensi:['scanA',{mode,text:tx}],acara:['scanE',{mode,text:tx,acara:$('#ac').value}],pembelajaran:['scanP',{mode,text:tx,guru:G}]}[pg];if(!q)return;
+ api(q[0],[q[1]]).then(r=>{setRS(r.ok?'ok':'no',(r.ok?'✔ ':'✖ ')+r.msg);beep(r.ok);
+  if(r.step=='guru'){G=r.kode;$('#gu').textContent='Guru: '+r.nama+' → scan QR-Kelas'}
+  else if(r.ok){if(pg=='pembelajaran'){G='';$('#gu').textContent=HINT}$('#ls').insertAdjacentHTML('afterbegin',`<div>${new Date().toLocaleTimeString()} — ${esc(r.msg)}</div>`)}}).catch(e=>setRS('no','✖ '+e.message))}
 
 fetch(API,{method:'POST',body:JSON.stringify({fn:'pub',a:[]})}).then(r=>r.json()).then(j=>apply(j.r||{})).catch(()=>apply({}));
 if(T)api('me').then(u=>{U=u;start()}).catch(()=>{});
